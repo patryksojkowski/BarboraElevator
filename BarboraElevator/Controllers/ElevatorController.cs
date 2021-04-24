@@ -19,14 +19,17 @@ namespace BarboraElevator.Controllers
         private readonly ILogger<ElevatorController> logger;
         private readonly IElevatorRouteService elevatorRouteService;
         private readonly IElevatorPoolService elevatorPoolService;
+        private readonly IElevatorEventLogService elevatorEventLogService;
 
         public ElevatorController(ILogger<ElevatorController> logger,
             IElevatorRouteService elevatorRouteService,
-            IElevatorPoolService elevatorPoolService)
+            IElevatorPoolService elevatorPoolService,
+            IElevatorEventLogService elevatorEventLogService)
         {
             this.logger = logger;
             this.elevatorRouteService = elevatorRouteService;
             this.elevatorPoolService = elevatorPoolService;
+            this.elevatorEventLogService = elevatorEventLogService;
         }
 
         [Route("CallElevator")]
@@ -67,20 +70,19 @@ namespace BarboraElevator.Controllers
             return Ok(status);
         }
 
+        [Route("GetEventLog")]
         public IActionResult GetElevatorEventLog(int elevatorId)
         {
-            var elevatorJson = HttpContext.Session.GetString(elevatorId.ToString());
-            var elevator = JsonConvert.DeserializeObject<ElevatorModel>(elevatorJson);
-
-            object eventLog = null;
+            string eventLog = null;
 
             try
             {
-                // assign elevator status
+                var elevator = elevatorPoolService.GetElevator(elevatorId);
+                eventLog = elevatorEventLogService.GetEventLog(elevator);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unable to get elevator status");
+                logger.LogError(ex, "Unable to get elevator events");
             }
 
             return Ok(eventLog);

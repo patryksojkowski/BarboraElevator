@@ -30,6 +30,7 @@ namespace BarboraElevator
             services.AddControllers();
             services.AddSingleton<IElevatorRouteService, ElevatorRouteService>();
             services.AddSingleton<IElevatorPoolService, ElevatorPoolService>();
+            services.AddSingleton<IElevatorEventLogService, ElevatorEventLogService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

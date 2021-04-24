@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace BarboraElevator.Services.Interfaces
 {
-    public interface IElevatorPoolService
+    public interface IElevatorEventLogService
     {
-        public ElevatorModel TakeClosestElevator(int floor);
-        void ReleaseElevator(int elevatorId);
-        ElevatorModel GetElevator(int id);
+        public string GetEventLog(ElevatorModel elevator);
+        public void AddNewEvent(ElevatorModel elevator, string subject);
     }
 }

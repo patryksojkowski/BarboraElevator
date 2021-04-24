@@ -10,10 +10,13 @@ namespace BarboraElevator.Services
     public class ElevatorRouteService : IElevatorRouteService
     {
         private readonly IElevatorPoolService elevatorPoolService;
+        private readonly IElevatorEventLogService elevatorEventLogService;
 
-        public ElevatorRouteService(IElevatorPoolService elevatorPoolService)
+        public ElevatorRouteService(IElevatorPoolService elevatorPoolService,
+            IElevatorEventLogService elevatorEventLogService)
         {
             this.elevatorPoolService = elevatorPoolService;
+            this.elevatorEventLogService = elevatorEventLogService;
         }
 
         public ElevatorMovementResult InitiateRoute(int startFloor, int targetFloor)
@@ -57,6 +60,8 @@ namespace BarboraElevator.Services
         private async Task LockDoor(ElevatorModel elevator)
         {
             elevator.IsDoorLocked = true;
+            elevatorEventLogService.AddNewEvent(elevator, "Door locked");
+
             await Task.Delay(2000);
         }
 
@@ -68,7 +73,10 @@ namespace BarboraElevator.Services
             while (elevator.CurrentFloor != targetFloor)
             {
                 await Task.Delay(1000);
+                var previousFloor = elevator.CurrentFloor;
                 elevator.CurrentFloor += directionUp ? 1 : -1;
+
+                elevatorEventLogService.AddNewEvent(elevator, $"Changed floor from {previousFloor} to {elevator.CurrentFloor}");
             }
         }
 
@@ -76,6 +84,8 @@ namespace BarboraElevator.Services
         {
             await Task.Delay(2000);
             elevator.IsDoorLocked = false;
+
+            elevatorEventLogService.AddNewEvent(elevator, "Door unlocked");
         }
     }
 }

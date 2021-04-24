@@ -13,16 +13,35 @@ namespace BarboraElevator.Services
         object locker = new object();
         private readonly ConcurrentDictionary<int, ElevatorModel> freeElevators = new ConcurrentDictionary<int, ElevatorModel>();
         private readonly ConcurrentDictionary<int, ElevatorModel> occupiedElevators = new ConcurrentDictionary<int, ElevatorModel>();
+        private readonly Dictionary<int, ElevatorModel> allElevators = new Dictionary<int, ElevatorModel>();
+        private readonly IElevatorEventLogService elevatorEventLogService;
 
-        public ElevatorPoolService()
+        public ElevatorPoolService(IElevatorEventLogService elevatorEventLogService)
         {
             for (var i = 0; i < 5; i++)
             {
-                freeElevators.TryAdd(i, new ElevatorModel
+                var elevator = new ElevatorModel
                 {
                     Id = i
-                });
+                };
+                allElevators.Add(elevator.Id, elevator);
+                freeElevators.TryAdd(elevator.Id, elevator);
             }
+
+            this.elevatorEventLogService = elevatorEventLogService;
+        }
+
+        /// <summary>
+        /// it could return some kind of lightweight readonly model instead of whole elevator object that could be altered.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ElevatorModel GetElevator(int id)
+        {
+            if (!allElevators.ContainsKey(id))
+                return null;
+
+            return allElevators[id];
         }
 
         public ElevatorModel TakeClosestElevator(int floor)
@@ -38,6 +57,9 @@ namespace BarboraElevator.Services
 
                 freeElevators.TryRemove(closestElevatorEntry.Key, out var closestElevator);
                 occupiedElevators.TryAdd(closestElevatorEntry.Key, closestElevator);
+
+                elevatorEventLogService.AddNewEvent(closestElevator, "Called elevator");
+
                 return closestElevator;
             }
         }
@@ -48,6 +70,8 @@ namespace BarboraElevator.Services
             {
                 occupiedElevators.TryRemove(elevatorId, out var elevator);
                 freeElevators.TryAdd(elevatorId, elevator);
+
+                elevatorEventLogService.AddNewEvent(elevator, "Elevator is free");
             }
         }
     }
