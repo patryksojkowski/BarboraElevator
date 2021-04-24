@@ -35,7 +35,7 @@ namespace BarboraElevator.Controllers
         [Route("CallElevator")]
         public IActionResult CallElevator(int start, int end)
         {
-            ElevatorMovementResult result = null;
+            ElevatorMovementResult result;
             try
             {
                 result = elevatorRouteService.InitiateRoute(start, end);
@@ -43,6 +43,7 @@ namespace BarboraElevator.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unable to call elevator");
+                return BadRequest("Unable to call elevator");
             }
 
             if (!(result is ElevatorMovementStartedResult startedResult))
@@ -54,8 +55,7 @@ namespace BarboraElevator.Controllers
         [Route("GetStatus")]
         public IActionResult GetElevatorStatus(int id)
         {
-            object status = null;
-
+            string status;
             try
             {
                 var elevator = elevatorPoolService.GetElevator(id);
@@ -64,6 +64,7 @@ namespace BarboraElevator.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unable to get elevator status");
+                return BadRequest("Unable to get elevator status");
             }
 
             return Ok(status);
@@ -72,8 +73,7 @@ namespace BarboraElevator.Controllers
         [Route("GetEventLog")]
         public IActionResult GetElevatorEventLog(int id)
         {
-            string eventLog = null;
-
+            string eventLog;
             try
             {
                 var elevator = elevatorPoolService.GetElevator(id);
@@ -82,6 +82,7 @@ namespace BarboraElevator.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unable to get elevator events");
+                return BadRequest("Unable to get elevator events");
             }
 
             return Ok(eventLog);
