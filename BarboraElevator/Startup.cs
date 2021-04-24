@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BarboraElevator.Configuration;
 using BarboraElevator.Services;
 using BarboraElevator.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -28,10 +29,14 @@ namespace BarboraElevator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
             services.AddSingleton<IElevatorRouteService, ElevatorRouteService>();
             services.AddSingleton<IElevatorPoolService, ElevatorPoolService>();
             services.AddSingleton<IElevatorEventLogService, ElevatorEventLogService>();
             services.AddSingleton<IElevatorStatusService, ElevatorStatusService>();
+            services.AddSingleton<IElevatorControlService, ElevatorControlService>();
+
+            services.AddSingleton(Configuration.GetSection("BuildingConfiguration").Get<BuildingConfiguration>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,4 +1,5 @@
-﻿using BarboraElevator.Model;
+﻿using BarboraElevator.Configuration;
+using BarboraElevator.Model;
 using BarboraElevator.Services.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -9,15 +10,20 @@ namespace BarboraElevator.Services
 {
     public class ElevatorPoolService : IElevatorPoolService
     {
-        object locker = new object();
+        private readonly object locker = new object();
+
+        private readonly Dictionary<int, ElevatorModel> allElevators = new Dictionary<int, ElevatorModel>();
         private readonly ConcurrentDictionary<int, ElevatorModel> freeElevators = new ConcurrentDictionary<int, ElevatorModel>();
         private readonly ConcurrentDictionary<int, ElevatorModel> occupiedElevators = new ConcurrentDictionary<int, ElevatorModel>();
-        private readonly Dictionary<int, ElevatorModel> allElevators = new Dictionary<int, ElevatorModel>();
+
         private readonly IElevatorEventLogService elevatorEventLogService;
 
-        public ElevatorPoolService(IElevatorEventLogService elevatorEventLogService)
+        public ElevatorPoolService(
+            IElevatorEventLogService elevatorEventLogService,
+            BuildingConfiguration buildingConfiguration)
         {
-            for (var i = 0; i < 5; i++)
+            var numberOfElevators = buildingConfiguration.NumberOfElevators;
+            for (var i = 0; i < numberOfElevators; i++)
             {
                 var elevator = new ElevatorModel
                 {
