@@ -20,9 +20,9 @@ namespace BarboraElevator.Services
 
         public ElevatorPoolService(
             IElevatorEventLogService elevatorEventLogService,
-            BuildingConfiguration buildingConfiguration)
+            IBuildingConfigurationService buildingConfigurationService)
         {
-            var numberOfElevators = buildingConfiguration.NumberOfElevators;
+            var numberOfElevators = buildingConfigurationService.GetNumberOfElevators();
             for (var i = 0; i < numberOfElevators; i++)
             {
                 var elevator = new ElevatorModel

@@ -15,18 +15,21 @@ namespace BarboraElevator.Controllers
         private readonly IElevatorPoolService elevatorPoolService;
         private readonly IElevatorEventLogService elevatorEventLogService;
         private readonly IElevatorStatusService elevatorStatusService;
+        private readonly IRouteValidationService routeValidationService;
 
         public ElevatorController(ILogger<ElevatorController> logger,
             IElevatorRouteService elevatorRouteService,
             IElevatorPoolService elevatorPoolService,
             IElevatorEventLogService elevatorEventLogService,
-            IElevatorStatusService elevatorStatusService)
+            IElevatorStatusService elevatorStatusService,
+            IRouteValidationService routeValidationService)
         {
             this.logger = logger;
             this.elevatorRouteService = elevatorRouteService;
             this.elevatorPoolService = elevatorPoolService;
             this.elevatorEventLogService = elevatorEventLogService;
             this.elevatorStatusService = elevatorStatusService;
+            this.routeValidationService = routeValidationService;
         }
 
         [Route("CallElevator")]
@@ -35,7 +38,8 @@ namespace BarboraElevator.Controllers
             ElevatorMovementResult result = null;
             try
             {
-                result = elevatorRouteService.InitiateRoute(start, end);
+                if (routeValidationService.IsRouteCorrect(start, end)) // this could be moved into elevatorrouteservice
+                    result = elevatorRouteService.InitiateRoute(start, end);
             }
             catch (Exception ex)
             {

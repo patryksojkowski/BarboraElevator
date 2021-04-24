@@ -35,6 +35,8 @@ namespace BarboraElevator
             services.AddSingleton<IElevatorEventLogService, ElevatorEventLogService>();
             services.AddSingleton<IElevatorStatusService, ElevatorStatusService>();
             services.AddSingleton<IElevatorControlService, ElevatorControlService>();
+            services.AddSingleton<IBuildingConfigurationService, BuildingConfigurationService>();
+            services.AddSingleton<IRouteValidationService, RouteValidationService>();
 
             services.AddSingleton(Configuration.GetSection("BuildingConfiguration").Get<BuildingConfiguration>());
         }
