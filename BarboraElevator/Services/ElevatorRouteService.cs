@@ -1,4 +1,5 @@
 ﻿using BarboraElevator.Model;
+using BarboraElevator.Model.MovementResults;
 using BarboraElevator.Services.Interfaces;
 using System.Threading.Tasks;
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using BarboraElevator.Model;
+using BarboraElevator.Model.MovementResults;
 using BarboraElevator.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,24 +15,21 @@ namespace BarboraElevator.Controllers
         private readonly IElevatorPoolService elevatorPoolService;
         private readonly IElevatorEventLogService elevatorEventLogService;
         private readonly IElevatorStatusService elevatorStatusService;
-        private readonly IRouteValidationService routeValidationService;
 
         public ElevatorController(ILogger<ElevatorController> logger,
             IElevatorRouteService elevatorRouteService,
             IElevatorPoolService elevatorPoolService,
             IElevatorEventLogService elevatorEventLogService,
-            IElevatorStatusService elevatorStatusService,
-            IRouteValidationService routeValidationService)
+            IElevatorStatusService elevatorStatusService)
         {
             this.logger = logger;
             this.elevatorRouteService = elevatorRouteService;
             this.elevatorPoolService = elevatorPoolService;
             this.elevatorEventLogService = elevatorEventLogService;
             this.elevatorStatusService = elevatorStatusService;
-            this.routeValidationService = routeValidationService;
         }
 
-        [Route("CallElevator")]
+        [Route("call")]
         public IActionResult CallElevator(int start, int end)
         {
             ElevatorMovementResult result;
@@ -52,7 +49,7 @@ namespace BarboraElevator.Controllers
             return Ok(startedResult.Message);
         }
 
-        [Route("GetStatus")]
+        [Route("status")]
         public IActionResult GetElevatorStatus(int id)
         {
             string status;
@@ -70,7 +67,7 @@ namespace BarboraElevator.Controllers
             return Ok(status);
         }
 
-        [Route("GetEventLog")]
+        [Route("events")]
         public IActionResult GetElevatorEventLog(int id)
         {
             string eventLog;

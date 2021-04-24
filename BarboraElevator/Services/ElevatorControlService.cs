@@ -27,7 +27,7 @@ namespace BarboraElevator.Services
                 var previousFloor = elevator.CurrentFloor;
                 elevator.CurrentFloor += isGoingUp ? 1 : -1;
 
-                elevatorEventLogService.AddNewEvent(elevator, $"Changed floor from {previousFloor} to {elevator.CurrentFloor}");
+                elevatorEventLogService.LogEvent(elevator, $"Changed floor from {previousFloor} to {elevator.CurrentFloor}");
             }
 
             elevator.IsMoving = false;
@@ -36,7 +36,7 @@ namespace BarboraElevator.Services
         public async Task LockDoor(ElevatorModel elevator)
         {
             elevator.IsDoorLocked = true;
-            elevatorEventLogService.AddNewEvent(elevator, "Door locked");
+            elevatorEventLogService.LogEvent(elevator, "Door locked");
 
             await Task.Delay(Constant.DoorOperationTimeInMiliseconds);
         }
@@ -46,7 +46,7 @@ namespace BarboraElevator.Services
             await Task.Delay(Constant.DoorOperationTimeInMiliseconds);
             elevator.IsDoorLocked = false;
 
-            elevatorEventLogService.AddNewEvent(elevator, "Door unlocked");
+            elevatorEventLogService.LogEvent(elevator, "Door unlocked");
         }
     }
 }

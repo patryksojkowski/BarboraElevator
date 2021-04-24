@@ -8,7 +8,7 @@ namespace BarboraElevator.Services
 {
     public class ElevatorEventLogService : IElevatorEventLogService
     {
-        public void AddNewEvent(ElevatorModel elevator, string subject)
+        public void LogEvent(ElevatorModel elevator, string subject)
         {
             elevator.Events.Add(new ElevatorEvent
             {

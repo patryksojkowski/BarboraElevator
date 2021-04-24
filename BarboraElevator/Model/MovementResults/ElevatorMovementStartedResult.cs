@@ -1,4 +1,4 @@
-﻿namespace BarboraElevator.Model
+﻿namespace BarboraElevator.Model.MovementResults
 {
     public class ElevatorMovementStartedResult : ElevatorMovementResult
     {

@@ -1,4 +1,4 @@
-﻿using BarboraElevator.Model;
+﻿using BarboraElevator.Model.MovementResults;
 
 namespace BarboraElevator.Services.Interfaces
 {

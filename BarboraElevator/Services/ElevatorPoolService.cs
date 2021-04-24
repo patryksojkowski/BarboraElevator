@@ -52,17 +52,18 @@ namespace BarboraElevator.Services
         {
             lock (locker)
             {
-                var closestElevatorEntry = freeElevators
-                    .OrderBy(p => Math.Abs(p.Value.CurrentFloor - floor))
-                    .FirstOrDefault();
+                var orderedElevators = freeElevators
+                    .OrderBy(p => Math.Abs(p.Value.CurrentFloor - floor));
 
-                if (closestElevatorEntry.Equals(default(KeyValuePair<int, ElevatorModel>)))
+                if (!orderedElevators.Any())
                     return null;
+
+                var closestElevatorEntry = orderedElevators.First();
 
                 freeElevators.TryRemove(closestElevatorEntry.Key, out var closestElevator);
                 occupiedElevators.TryAdd(closestElevatorEntry.Key, closestElevator);
 
-                elevatorEventLogService.AddNewEvent(closestElevator, "Called elevator");
+                elevatorEventLogService.LogEvent(closestElevator, "Called elevator");
 
                 return closestElevator;
             }
@@ -75,7 +76,7 @@ namespace BarboraElevator.Services
                 occupiedElevators.TryRemove(elevatorId, out var elevator);
                 freeElevators.TryAdd(elevatorId, elevator);
 
-                elevatorEventLogService.AddNewEvent(elevator, "Elevator is free");
+                elevatorEventLogService.LogEvent(elevator, "Elevator is free");
             }
         }
     }
