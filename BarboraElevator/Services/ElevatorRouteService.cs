@@ -68,16 +68,20 @@ namespace BarboraElevator.Services
         private async Task GoToFloor(ElevatorModel elevator, int targetFloor)
         {
             var floorsToGo = targetFloor - elevator.CurrentFloor;
-            var directionUp = floorsToGo > 0;
+            var isGoingUp = floorsToGo > 0;
+            elevator.IsMoving = true;
+            elevator.IsGoingUp = isGoingUp;
 
             while (elevator.CurrentFloor != targetFloor)
             {
                 await Task.Delay(1000);
                 var previousFloor = elevator.CurrentFloor;
-                elevator.CurrentFloor += directionUp ? 1 : -1;
+                elevator.CurrentFloor += isGoingUp ? 1 : -1;
 
                 elevatorEventLogService.AddNewEvent(elevator, $"Changed floor from {previousFloor} to {elevator.CurrentFloor}");
             }
+
+            elevator.IsMoving = false;
         }
 
         private async Task UnlockDoor(ElevatorModel elevator)

@@ -13,5 +13,6 @@ namespace BarboraElevator.Model
         public bool IsGoingUp { get; set; }
         public int CurrentFloor { get; set; }
         public IList<ElevatorEvent> Events { get; set; } = new List<ElevatorEvent>();
+        public string MovementDirection => IsMoving ? (IsGoingUp ? "Up" : "Down") : "None";
     }
 }
