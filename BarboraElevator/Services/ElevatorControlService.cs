@@ -1,4 +1,5 @@
-﻿using BarboraElevator.Model;
+﻿using BarboraElevator.Constants;
+using BarboraElevator.Model;
 using BarboraElevator.Services.Interfaces;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace BarboraElevator.Services
 
             while (elevator.CurrentFloor != targetFloor)
             {
-                await Task.Delay(1000);
+                await Task.Delay(Constant.MovementPerFloorTimeInMiliseconds);
                 var previousFloor = elevator.CurrentFloor;
                 elevator.CurrentFloor += isGoingUp ? 1 : -1;
 
@@ -37,12 +38,12 @@ namespace BarboraElevator.Services
             elevator.IsDoorLocked = true;
             elevatorEventLogService.AddNewEvent(elevator, "Door locked");
 
-            await Task.Delay(2000);
+            await Task.Delay(Constant.DoorOperationTimeInMiliseconds);
         }
 
         public async Task UnlockDoor(ElevatorModel elevator)
         {
-            await Task.Delay(2000);
+            await Task.Delay(Constant.DoorOperationTimeInMiliseconds);
             elevator.IsDoorLocked = false;
 
             elevatorEventLogService.AddNewEvent(elevator, "Door unlocked");

@@ -8,24 +8,40 @@ namespace BarboraElevator.Services
     {
         private readonly IElevatorPoolService elevatorPoolService;
         private readonly IElevatorControlService elevatorControlService;
+        private readonly IRouteValidationService routeValidationService;
 
         public ElevatorRouteService(
             IElevatorPoolService elevatorPoolService,
-            IElevatorControlService elevatorControlService)
+            IElevatorControlService elevatorControlService,
+            IRouteValidationService routeValidationService)
         {
             this.elevatorPoolService = elevatorPoolService;
             this.elevatorControlService = elevatorControlService;
+            this.routeValidationService = routeValidationService;
         }
 
         public ElevatorMovementResult InitiateRoute(int startFloor, int targetFloor)
         {
+            if (!routeValidationService.IsRouteCorrect(startFloor, targetFloor))
+            {
+                return new ElevatorMovementNotStartedResult
+                {
+                    Message = "Invalid starting or destination floor."
+                };
+            }
+
             if (startFloor == targetFloor)
                 return new ElevatorMovementNotNeededResult();
 
             var elevatorModel = elevatorPoolService.TakeClosestElevator(startFloor);
 
             if (elevatorModel == null)
-                return new ElevatorMovementNotStartedResult();
+            {
+                return new ElevatorMovementNotStartedResult
+                {
+                    Message = "No elevators available."
+                };
+            }
 
             Task.Run(() => PerformRoute(elevatorModel, startFloor, targetFloor));
 

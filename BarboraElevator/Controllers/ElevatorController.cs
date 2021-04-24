@@ -38,8 +38,7 @@ namespace BarboraElevator.Controllers
             ElevatorMovementResult result = null;
             try
             {
-                if (routeValidationService.IsRouteCorrect(start, end)) // this could be moved into elevatorrouteservice
-                    result = elevatorRouteService.InitiateRoute(start, end);
+                result = elevatorRouteService.InitiateRoute(start, end);
             }
             catch (Exception ex)
             {

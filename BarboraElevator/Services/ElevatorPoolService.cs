@@ -1,5 +1,4 @@
-﻿using BarboraElevator.Configuration;
-using BarboraElevator.Model;
+﻿using BarboraElevator.Model;
 using BarboraElevator.Services.Interfaces;
 using System;
 using System.Collections.Concurrent;
