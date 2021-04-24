@@ -43,7 +43,7 @@ namespace BarboraElevator.Controllers
             }
 
             if (result == null || !result.MovementInitiatedSuccessfully)
-                return BadRequest();
+                return BadRequest("No elevator available");
 
             return Ok("Elevator called");
         }
