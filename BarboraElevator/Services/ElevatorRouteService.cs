@@ -11,12 +11,16 @@ namespace BarboraElevator.Services
     {
         private readonly IElevatorPoolService elevatorPoolService;
         private readonly IElevatorEventLogService elevatorEventLogService;
+        private readonly IElevatorControlService elevatorControlService;
 
-        public ElevatorRouteService(IElevatorPoolService elevatorPoolService,
-            IElevatorEventLogService elevatorEventLogService)
+        public ElevatorRouteService(
+            IElevatorPoolService elevatorPoolService,
+            IElevatorEventLogService elevatorEventLogService,
+            IElevatorControlService elevatorControlService)
         {
             this.elevatorPoolService = elevatorPoolService;
             this.elevatorEventLogService = elevatorEventLogService;
+            this.elevatorControlService = elevatorControlService;
         }
 
         public ElevatorMovementResult InitiateRoute(int startFloor, int targetFloor)
@@ -50,46 +54,12 @@ namespace BarboraElevator.Services
             if (elevator.CurrentFloor == targetFloor)
                 return;
 
-            await LockDoor(elevator);
 
-            await GoToFloor(elevator, targetFloor);
+            await elevatorControlService.LockDoor(elevator);
 
-            await UnlockDoor(elevator);
-        }
+            await elevatorControlService.GoToFloor(elevator, targetFloor);
 
-        private async Task LockDoor(ElevatorModel elevator)
-        {
-            elevator.IsDoorLocked = true;
-            elevatorEventLogService.AddNewEvent(elevator, "Door locked");
-
-            await Task.Delay(2000);
-        }
-
-        private async Task GoToFloor(ElevatorModel elevator, int targetFloor)
-        {
-            var floorsToGo = targetFloor - elevator.CurrentFloor;
-            var isGoingUp = floorsToGo > 0;
-            elevator.IsMoving = true;
-            elevator.IsGoingUp = isGoingUp;
-
-            while (elevator.CurrentFloor != targetFloor)
-            {
-                await Task.Delay(1000);
-                var previousFloor = elevator.CurrentFloor;
-                elevator.CurrentFloor += isGoingUp ? 1 : -1;
-
-                elevatorEventLogService.AddNewEvent(elevator, $"Changed floor from {previousFloor} to {elevator.CurrentFloor}");
-            }
-
-            elevator.IsMoving = false;
-        }
-
-        private async Task UnlockDoor(ElevatorModel elevator)
-        {
-            await Task.Delay(2000);
-            elevator.IsDoorLocked = false;
-
-            elevatorEventLogService.AddNewEvent(elevator, "Door unlocked");
+            await elevatorControlService.UnlockDoor(elevator);
         }
     }
 }
