@@ -1,9 +1,6 @@
 ﻿using BarboraElevator.Model;
 using BarboraElevator.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BarboraElevator.Services
 {
@@ -21,6 +18,5 @@ namespace BarboraElevator.Services
         {
             return $"ElevatorId = {elevator.Id} \n IsMoving = {elevator.IsMoving} \n CurrentFloor {elevator.CurrentFloor} \n Direction : {elevator.MovementDirection}";
         }
-
     }
 }

@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BarboraElevator.Model;
-using BarboraElevator.Services;
 using BarboraElevator.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace BarboraElevator.Controllers
 {
@@ -48,20 +42,20 @@ namespace BarboraElevator.Controllers
                 logger.LogError(ex, "Unable to call elevator");
             }
 
-            if (result == null || !result.MovementInitiatedSuccessfully)
-                return BadRequest("No elevator available");
+            if (!(result is ElevatorMovementStartedResult startedResult))
+                return BadRequest(result?.Message ?? "Unexpected result");
 
-            return Ok("Elevator called");
+            return Ok(startedResult.Message);
         }
 
         [Route("GetStatus")]
-        public IActionResult GetElevatorStatus(int elevatorId)
+        public IActionResult GetElevatorStatus(int id)
         {
             object status = null;
 
             try
             {
-                var elevator = elevatorPoolService.GetElevator(elevatorId);
+                var elevator = elevatorPoolService.GetElevator(id);
                 status = elevatorStatusService.GetStatus(elevator);
             }
             catch (Exception ex)
@@ -73,13 +67,13 @@ namespace BarboraElevator.Controllers
         }
 
         [Route("GetEventLog")]
-        public IActionResult GetElevatorEventLog(int elevatorId)
+        public IActionResult GetElevatorEventLog(int id)
         {
             string eventLog = null;
 
             try
             {
-                var elevator = elevatorPoolService.GetElevator(elevatorId);
+                var elevator = elevatorPoolService.GetElevator(id);
                 eventLog = elevatorEventLogService.GetEventLog(elevator);
             }
             catch (Exception ex)

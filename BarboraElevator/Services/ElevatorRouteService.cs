@@ -1,8 +1,5 @@
 ﻿using BarboraElevator.Model;
 using BarboraElevator.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BarboraElevator.Services
@@ -10,35 +7,29 @@ namespace BarboraElevator.Services
     public class ElevatorRouteService : IElevatorRouteService
     {
         private readonly IElevatorPoolService elevatorPoolService;
-        private readonly IElevatorEventLogService elevatorEventLogService;
         private readonly IElevatorControlService elevatorControlService;
 
         public ElevatorRouteService(
             IElevatorPoolService elevatorPoolService,
-            IElevatorEventLogService elevatorEventLogService,
             IElevatorControlService elevatorControlService)
         {
             this.elevatorPoolService = elevatorPoolService;
-            this.elevatorEventLogService = elevatorEventLogService;
             this.elevatorControlService = elevatorControlService;
         }
 
         public ElevatorMovementResult InitiateRoute(int startFloor, int targetFloor)
         {
             if (startFloor == targetFloor)
-                return ElevatorMovementResult.NoMovementNeeded;
+                return new ElevatorMovementNotNeededResult();
 
             var elevatorModel = elevatorPoolService.TakeClosestElevator(startFloor);
 
             if (elevatorModel == null)
-                return ElevatorMovementResult.Failed;
+                return new ElevatorMovementNotStartedResult();
 
             Task.Run(() => PerformRoute(elevatorModel, startFloor, targetFloor));
 
-            return new ElevatorMovementResult
-            {
-                MovementInitiatedSuccessfully = true,
-            };
+            return new ElevatorMovementStartedResult();
         }
 
         private async Task PerformRoute(ElevatorModel elevator, int startFloor, int targetFloor)
@@ -53,7 +44,6 @@ namespace BarboraElevator.Services
         {
             if (elevator.CurrentFloor == targetFloor)
                 return;
-
 
             await elevatorControlService.LockDoor(elevator);
 
