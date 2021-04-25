@@ -4,8 +4,8 @@ namespace BarboraElevator.Services.Interfaces
 {
     public interface IElevatorPoolService
     {
-        public ElevatorModel TakeClosestElevator(int floor);
+        ElevatorModel TakeClosestElevator(int floor);
         void ReleaseElevator(int elevatorId);
-        ElevatorModel GetElevator(int id);
+        ReadOnlyElevatorModel GetElevator(int id);
     }
 }

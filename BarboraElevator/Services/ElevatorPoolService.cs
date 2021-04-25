@@ -17,35 +17,20 @@ namespace BarboraElevator.Services
 
         private readonly IElevatorEventLogService elevatorEventLogService;
 
-        public ElevatorPoolService(
-            IElevatorEventLogService elevatorEventLogService,
-            IBuildingConfigurationService buildingConfigurationService)
+        public ElevatorPoolService(IElevatorEventLogService elevatorEventLogService, IBuildingConfigurationService buildingConfigurationService)
         {
             var numberOfElevators = buildingConfigurationService.GetNumberOfElevators();
-            for (var i = 0; i < numberOfElevators; i++)
-            {
-                var elevator = new ElevatorModel
-                {
-                    Id = i
-                };
-                allElevators.Add(elevator.Id, elevator);
-                freeElevators.TryAdd(elevator.Id, elevator);
-            }
+            InitializeElevators(numberOfElevators);
 
             this.elevatorEventLogService = elevatorEventLogService;
         }
 
-        /// <summary>
-        /// it could return some kind of lightweight readonly model instead of whole elevator object that could be altered.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public ElevatorModel GetElevator(int id)
+        public ReadOnlyElevatorModel GetElevator(int id)
         {
             if (!allElevators.ContainsKey(id))
                 return null;
 
-            return allElevators[id];
+            return new ReadOnlyElevatorModel(allElevators[id]);
         }
 
         public ElevatorModel TakeClosestElevator(int floor)
@@ -77,6 +62,19 @@ namespace BarboraElevator.Services
                 freeElevators.TryAdd(elevatorId, elevator);
 
                 elevatorEventLogService.LogEvent(elevator, "Elevator is free");
+            }
+        }
+
+        private void InitializeElevators(uint numberOfElevators)
+        {
+            for (var i = 0; i < numberOfElevators; i++)
+            {
+                var elevator = new ElevatorModel
+                {
+                    Id = i
+                };
+                allElevators.Add(elevator.Id, elevator);
+                freeElevators.TryAdd(elevator.Id, elevator);
             }
         }
     }

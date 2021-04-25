@@ -1,7 +1,7 @@
-﻿using BarboraElevator.Model;
+﻿using BarboraElevator.Helpers;
+using BarboraElevator.Model;
 using BarboraElevator.Services.Interfaces;
 using System;
-using System.Linq;
 using System.Text;
 
 namespace BarboraElevator.Services
@@ -10,21 +10,26 @@ namespace BarboraElevator.Services
     {
         public void LogEvent(ElevatorModel elevator, string subject)
         {
+            if (elevator == null)
+                throw new ArgumentNullException();
+
             elevator.Events.Add(new ElevatorEvent
             {
                 Subject = subject,
-                TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds()
+                TimeStamp = TimeStampHelper.GetCurrentTimeStamp()
             });
         }
 
-        public string GetEventLog(ElevatorModel elevator)
+        public string GetEventLog(ReadOnlyElevatorModel elevator)
         {
-            var sb = new StringBuilder();
-            var lines =  elevator.Events.Select(x => x.ToString());
+            if (elevator == null)
+                throw new ArgumentNullException();
 
-            foreach(var line in lines)
+            var sb = new StringBuilder();
+
+            foreach (var ev in elevator.Events)
             {
-                sb.AppendLine(line);
+                sb.AppendLine(ev.ToString());
             }
 
             return sb.ToString();

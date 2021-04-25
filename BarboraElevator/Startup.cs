@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BarboraElevator.Configuration;
+using BarboraElevator.Model.Configuration;
 using BarboraElevator.Services;
 using BarboraElevator.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;

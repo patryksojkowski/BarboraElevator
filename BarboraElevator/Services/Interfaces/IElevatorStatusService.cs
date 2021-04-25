@@ -4,6 +4,6 @@ namespace BarboraElevator.Services.Interfaces
 {
     public interface IElevatorStatusService
     {
-        string GetStatus(ElevatorModel elevator);
+        string GetStatus(ReadOnlyElevatorModel elevator);
     }
 }
