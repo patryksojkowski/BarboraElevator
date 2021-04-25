@@ -30,14 +30,14 @@ namespace BarboraElevator
         {
             services.AddControllers();
 
-            services.AddSingleton<IElevatorRouteService, ElevatorRouteService>();
-            services.AddSingleton<IElevatorPoolService, ElevatorPoolService>();
-            services.AddSingleton<IElevatorEventLogService, ElevatorEventLogService>();
-            services.AddSingleton<IElevatorStatusService, ElevatorStatusService>();
-            services.AddSingleton<IElevatorControlService, ElevatorControlService>();
-            services.AddSingleton<IBuildingConfigurationService, BuildingConfigurationService>();
-            services.AddSingleton<IRouteValidationService, RouteValidationService>();
+            services.AddTransient<IElevatorRouteService, ElevatorRouteService>();
+            services.AddTransient<IElevatorEventLogService, ElevatorEventLogService>();
+            services.AddTransient<IElevatorStatusService, ElevatorStatusService>();
+            services.AddTransient<IElevatorControlService, ElevatorControlService>();
+            services.AddTransient<IBuildingConfigurationService, BuildingConfigurationService>();
+            services.AddTransient<IRouteValidationService, RouteValidationService>();
 
+            services.AddSingleton<IElevatorPoolService, ElevatorPoolService>();
             services.AddSingleton(Configuration.GetSection("BuildingConfiguration").Get<BuildingConfiguration>());
         }
 
