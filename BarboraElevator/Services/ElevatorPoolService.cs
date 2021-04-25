@@ -16,25 +16,33 @@ namespace BarboraElevator.Services
         private readonly ConcurrentDictionary<int, ElevatorModel> occupiedElevators = new ConcurrentDictionary<int, ElevatorModel>();
 
         private readonly IElevatorEventLogService elevatorEventLogService;
+        private readonly IRouteValidationService routeValidationService;
 
-        public ElevatorPoolService(IElevatorEventLogService elevatorEventLogService, IBuildingConfigurationService buildingConfigurationService)
+        public ElevatorPoolService(
+            IElevatorEventLogService elevatorEventLogService,
+            IBuildingConfigurationService buildingConfigurationService,
+            IRouteValidationService routeValidationService)
         {
             var numberOfElevators = buildingConfigurationService.GetNumberOfElevators();
             InitializeElevators(numberOfElevators);
 
             this.elevatorEventLogService = elevatorEventLogService;
+            this.routeValidationService = routeValidationService;
         }
 
         public ReadOnlyElevatorModel GetElevator(int id)
         {
             if (!allElevators.ContainsKey(id))
-                return null;
+                throw new ArgumentOutOfRangeException(nameof(id));
 
             return new ReadOnlyElevatorModel(allElevators[id]);
         }
 
         public ElevatorModel TakeClosestElevator(int floor)
         {
+            if (!routeValidationService.IsFloorNumberCorrect(floor))
+                throw new ArgumentOutOfRangeException(nameof(floor));
+
             lock (locker)
             {
                 var orderedElevators = freeElevators
@@ -56,12 +64,18 @@ namespace BarboraElevator.Services
 
         public void ReleaseElevator(int elevatorId)
         {
+            if (!allElevators.ContainsKey(elevatorId))
+                throw new ArgumentOutOfRangeException(nameof(elevatorId));
+
             lock (locker)
             {
-                occupiedElevators.TryRemove(elevatorId, out var elevator);
-                freeElevators.TryAdd(elevatorId, elevator);
+                var result = true;
 
-                elevatorEventLogService.LogEvent(elevator, "Elevator is free");
+                result &= occupiedElevators.TryRemove(elevatorId, out var elevator);
+                result &= freeElevators.TryAdd(elevatorId, elevator);
+
+                if (result)
+                    elevatorEventLogService.LogEvent(elevator, "Elevator is free");
             }
         }
 

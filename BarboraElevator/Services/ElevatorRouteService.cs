@@ -10,15 +10,18 @@ namespace BarboraElevator.Services
         private readonly IElevatorPoolService elevatorPoolService;
         private readonly IElevatorControlService elevatorControlService;
         private readonly IRouteValidationService routeValidationService;
+        private readonly IElevatorEventLogService elevatorEventLogService;
 
         public ElevatorRouteService(
             IElevatorPoolService elevatorPoolService,
             IElevatorControlService elevatorControlService,
-            IRouteValidationService routeValidationService)
+            IRouteValidationService routeValidationService,
+            IElevatorEventLogService elevatorEventLogService)
         {
             this.elevatorPoolService = elevatorPoolService;
             this.elevatorControlService = elevatorControlService;
             this.routeValidationService = routeValidationService;
+            this.elevatorEventLogService = elevatorEventLogService;
         }
 
         public ElevatorMovementResult InitiateRoute(int startFloor, int targetFloor)
