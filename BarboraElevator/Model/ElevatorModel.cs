@@ -1,7 +1,5 @@
-﻿using System;
+﻿using BarboraElevator.Constants;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BarboraElevator.Model
 {
@@ -10,6 +8,9 @@ namespace BarboraElevator.Model
         public int Id { get; set; }
         public bool IsDoorLocked { get; set; }
         public bool IsMoving { get; set; }
-        public int CurrentFloor { get; set; }
+        public bool IsGoingUp { get; set; }
+        public int CurrentFloor { get; set; } = Constant.FirstFloorNumber;
+        public IList<ElevatorEvent> Events { get; set; } = new List<ElevatorEvent>();
+        public string MovementDirection => IsMoving ? (IsGoingUp ? "Up" : "Down") : "None";
     }
 }

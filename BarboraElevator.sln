@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarboraElevator", "BarboraElevator\BarboraElevator.csproj", "{CE641DE3-D59E-44F1-8FE6-814AFF79FA87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarboraElevator", "BarboraElevator\BarboraElevator.csproj", "{CE641DE3-D59E-44F1-8FE6-814AFF79FA87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarboraElevator.Tests", "BarboraElevator.Tests\BarboraElevator.Tests.csproj", "{54587EED-7C25-4309-A7BD-67DF745C619A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{CE641DE3-D59E-44F1-8FE6-814AFF79FA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE641DE3-D59E-44F1-8FE6-814AFF79FA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE641DE3-D59E-44F1-8FE6-814AFF79FA87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54587EED-7C25-4309-A7BD-67DF745C619A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54587EED-7C25-4309-A7BD-67DF745C619A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54587EED-7C25-4309-A7BD-67DF745C619A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54587EED-7C25-4309-A7BD-67DF745C619A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

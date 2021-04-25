@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BarboraElevator.Model;
-using BarboraElevator.Services;
+using BarboraElevator.Model.MovementResults;
 using BarboraElevator.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace BarboraElevator.Controllers
 {
@@ -19,20 +13,26 @@ namespace BarboraElevator.Controllers
         private readonly ILogger<ElevatorController> logger;
         private readonly IElevatorRouteService elevatorRouteService;
         private readonly IElevatorPoolService elevatorPoolService;
+        private readonly IElevatorEventLogService elevatorEventLogService;
+        private readonly IElevatorStatusService elevatorStatusService;
 
         public ElevatorController(ILogger<ElevatorController> logger,
             IElevatorRouteService elevatorRouteService,
-            IElevatorPoolService elevatorPoolService)
+            IElevatorPoolService elevatorPoolService,
+            IElevatorEventLogService elevatorEventLogService,
+            IElevatorStatusService elevatorStatusService)
         {
             this.logger = logger;
             this.elevatorRouteService = elevatorRouteService;
             this.elevatorPoolService = elevatorPoolService;
+            this.elevatorEventLogService = elevatorEventLogService;
+            this.elevatorStatusService = elevatorStatusService;
         }
 
-        [Route("CallElevator")]
+        [Route("call")]
         public IActionResult CallElevator(int start, int end)
         {
-            ElevatorMovementResult result = null;
+            ElevatorMovementResult result;
             try
             {
                 result = elevatorRouteService.InitiateRoute(start, end);
@@ -40,47 +40,46 @@ namespace BarboraElevator.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unable to call elevator");
+                return BadRequest("Unable to call elevator");
             }
 
-            if (result == null || !result.MovementInitiatedSuccessfully)
-                return BadRequest();
+            if (!(result is ElevatorMovementStartedResult startedResult))
+                return BadRequest(result?.Message ?? "Unexpected result");
 
-            return Ok("Elevator called");
+            return Ok(startedResult.Message);
         }
 
-        public IActionResult GetElevatorStatus(int elevatorId)
+        [Route("status")]
+        public IActionResult GetElevatorStatus(int id)
         {
-            var elevatorJson = HttpContext.Session.GetString(elevatorId.ToString());
-            var elevator = JsonConvert.DeserializeObject<ElevatorModel>(elevatorJson);
-
-            object status = null;
-
+            string status;
             try
             {
-                // assign elevator status
+                var elevator = elevatorPoolService.GetElevator(id);
+                status = elevatorStatusService.GetStatus(elevator);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unable to get elevator status");
+                return BadRequest("Unable to get elevator status");
             }
 
             return Ok(status);
         }
 
-        public IActionResult GetElevatorEventLog(int elevatorId)
+        [Route("events")]
+        public IActionResult GetElevatorEventLog(int id)
         {
-            var elevatorJson = HttpContext.Session.GetString(elevatorId.ToString());
-            var elevator = JsonConvert.DeserializeObject<ElevatorModel>(elevatorJson);
-
-            object eventLog = null;
-
+            string eventLog;
             try
             {
-                // assign elevator status
+                var elevator = elevatorPoolService.GetElevator(id);
+                eventLog = elevatorEventLogService.GetEventLog(elevator);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unable to get elevator status");
+                logger.LogError(ex, "Unable to get elevator events");
+                return BadRequest("Unable to get elevator events");
             }
 
             return Ok(eventLog);

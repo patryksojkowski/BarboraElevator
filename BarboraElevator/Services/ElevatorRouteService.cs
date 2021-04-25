@@ -1,8 +1,6 @@
 ﻿using BarboraElevator.Model;
+using BarboraElevator.Model.MovementResults;
 using BarboraElevator.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BarboraElevator.Services
@@ -10,56 +8,65 @@ namespace BarboraElevator.Services
     public class ElevatorRouteService : IElevatorRouteService
     {
         private readonly IElevatorPoolService elevatorPoolService;
+        private readonly IElevatorControlService elevatorControlService;
+        private readonly IRouteValidationService routeValidationService;
 
-        public ElevatorRouteService(IElevatorPoolService elevatorPoolService)
+        public ElevatorRouteService(
+            IElevatorPoolService elevatorPoolService,
+            IElevatorControlService elevatorControlService,
+            IRouteValidationService routeValidationService)
         {
             this.elevatorPoolService = elevatorPoolService;
+            this.elevatorControlService = elevatorControlService;
+            this.routeValidationService = routeValidationService;
         }
 
         public ElevatorMovementResult InitiateRoute(int startFloor, int targetFloor)
         {
+            if (!routeValidationService.IsRouteCorrect(startFloor, targetFloor))
+            {
+                return new ElevatorMovementNotStartedResult
+                {
+                    Message = "Invalid starting or destination floor."
+                };
+            }
+
             if (startFloor == targetFloor)
-                return ElevatorMovementResult.NoMovementNeeded;
+                return new ElevatorMovementNotNeededResult();
 
             var elevatorModel = elevatorPoolService.TakeClosestElevator(startFloor);
 
             if (elevatorModel == null)
-                return ElevatorMovementResult.Failed;
+            {
+                return new ElevatorMovementNotStartedResult
+                {
+                    Message = "No elevators available"
+                };
+            }
 
             Task.Run(() => PerformRoute(elevatorModel, startFloor, targetFloor));
 
-            return new ElevatorMovementResult
-            {
-                MovementInitiatedSuccessfully = true,
-            };
+            return new ElevatorMovementStartedResult();
         }
 
         private async Task PerformRoute(ElevatorModel elevator, int startFloor, int targetFloor)
         {
-            await GoToFloor(elevator, startFloor);
-            await GoToFloor(elevator, targetFloor);
+            await PerformSingleWayRoute(elevator, startFloor);
+            await PerformSingleWayRoute(elevator, targetFloor);
 
             elevatorPoolService.ReleaseElevator(elevator.Id);
         }
 
-        private async Task GoToFloor(ElevatorModel elevator, int targetFloor)
+        private async Task PerformSingleWayRoute(ElevatorModel elevator, int targetFloor)
         {
             if (elevator.CurrentFloor == targetFloor)
                 return;
 
-            var floorsToGo = targetFloor - elevator.CurrentFloor;
-            var directionUp = floorsToGo > 0;
+            await elevatorControlService.LockDoorAsync(elevator);
 
-            elevator.IsDoorLocked = true;
-            await Task.Delay(2000);
-            while (elevator.CurrentFloor != targetFloor)
-            {
-                await Task.Delay(1000);
-                elevator.CurrentFloor += directionUp ? 1 : -1;
-            }
+            await elevatorControlService.GoToFloorAsync(elevator, targetFloor);
 
-            await Task.Delay(2000);
-            elevator.IsDoorLocked = false;
+            await elevatorControlService.UnlockDoorAsync(elevator);
         }
     }
 }
