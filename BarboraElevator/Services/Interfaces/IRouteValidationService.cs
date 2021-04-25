@@ -2,6 +2,7 @@
 {
     public interface IRouteValidationService
     {
-        public bool IsRouteCorrect(int start, int end);
+        bool IsRouteCorrect(int start, int end);
+        bool IsFloorNumberCorrect(int floorNumber);
     }
 }

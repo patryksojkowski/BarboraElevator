@@ -12,6 +12,16 @@ namespace BarboraElevator.Services
             this.buildingConfigurationService = buildingConfigurationService;
         }
 
+        public bool IsFloorNumberCorrect(int floorNumber)
+        {
+            var numberOfFloors = buildingConfigurationService.GetNumberOfFloors();
+
+            if (floorNumber < Constant.FirstFloorNumber || floorNumber > numberOfFloors)
+                return false;
+
+            return true;
+        }
+
         public bool IsRouteCorrect(int start, int end)
         {
             var numberOfFloors = buildingConfigurationService.GetNumberOfFloors();

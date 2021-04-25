@@ -62,11 +62,11 @@ namespace BarboraElevator.Services
             if (elevator.CurrentFloor == targetFloor)
                 return;
 
-            await elevatorControlService.LockDoor(elevator);
+            await elevatorControlService.LockDoorAsync(elevator);
 
-            await elevatorControlService.GoToFloor(elevator, targetFloor);
+            await elevatorControlService.GoToFloorAsync(elevator, targetFloor);
 
-            await elevatorControlService.UnlockDoor(elevator);
+            await elevatorControlService.UnlockDoorAsync(elevator);
         }
     }
 }

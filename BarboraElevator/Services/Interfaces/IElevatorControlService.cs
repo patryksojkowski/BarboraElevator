@@ -5,8 +5,8 @@ namespace BarboraElevator.Services.Interfaces
 {
     public interface IElevatorControlService
     {
-        Task LockDoor(ElevatorModel elevator);
-        Task UnlockDoor(ElevatorModel elevator);
-        Task GoToFloor(ElevatorModel elevator, int targetFloor);
+        Task LockDoorAsync(ElevatorModel elevator);
+        Task UnlockDoorAsync(ElevatorModel elevator);
+        Task GoToFloorAsync(ElevatorModel elevator, int targetFloor);
     }
 }

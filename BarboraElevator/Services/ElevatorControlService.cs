@@ -1,6 +1,7 @@
 ﻿using BarboraElevator.Constants;
 using BarboraElevator.Model;
 using BarboraElevator.Services.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace BarboraElevator.Services
@@ -8,13 +9,42 @@ namespace BarboraElevator.Services
     public class ElevatorControlService : IElevatorControlService
     {
         private readonly IElevatorEventLogService elevatorEventLogService;
+        private readonly IRouteValidationService routeValidationService;
 
-        public ElevatorControlService(IElevatorEventLogService elevatorEventLogService)
+        public ElevatorControlService(IElevatorEventLogService elevatorEventLogService, IRouteValidationService routeValidationService)
         {
             this.elevatorEventLogService = elevatorEventLogService;
+            this.routeValidationService = routeValidationService;
         }
 
-        public async Task GoToFloor(ElevatorModel elevator, int targetFloor)
+        public Task GoToFloorAsync(ElevatorModel elevator, int targetFloor)
+        {
+            if (elevator == null)
+                throw new ArgumentNullException(nameof(elevator));
+
+            if (!routeValidationService.IsFloorNumberCorrect(targetFloor))
+                throw new ArgumentOutOfRangeException(nameof(targetFloor));
+
+            return GoToFloorInternalAsync(elevator, targetFloor);
+        }
+
+        public Task LockDoorAsync(ElevatorModel elevator)
+        {
+            if (elevator == null)
+                throw new ArgumentNullException(nameof(elevator));
+
+            return LockDoorInternalAsync(elevator);
+        }
+
+        public Task UnlockDoorAsync(ElevatorModel elevator)
+        {
+            if (elevator == null)
+                throw new ArgumentNullException(nameof(elevator));
+
+            return UnlockDoorInternalAsync(elevator);
+        }
+
+        private async Task GoToFloorInternalAsync(ElevatorModel elevator, int targetFloor)
         {
             var floorsToGo = targetFloor - elevator.CurrentFloor;
             var isGoingUp = floorsToGo > 0;
@@ -33,7 +63,7 @@ namespace BarboraElevator.Services
             elevator.IsMoving = false;
         }
 
-        public async Task LockDoor(ElevatorModel elevator)
+        private async Task LockDoorInternalAsync(ElevatorModel elevator)
         {
             elevator.IsDoorLocked = true;
             elevatorEventLogService.LogEvent(elevator, "Door locked");
@@ -41,7 +71,7 @@ namespace BarboraElevator.Services
             await Task.Delay(Constant.DoorOperationTimeInMiliseconds);
         }
 
-        public async Task UnlockDoor(ElevatorModel elevator)
+        private async Task UnlockDoorInternalAsync(ElevatorModel elevator)
         {
             await Task.Delay(Constant.DoorOperationTimeInMiliseconds);
             elevator.IsDoorLocked = false;
