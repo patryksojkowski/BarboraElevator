@@ -10,18 +10,15 @@ namespace BarboraElevator.Services
         private readonly IElevatorPoolService elevatorPoolService;
         private readonly IElevatorControlService elevatorControlService;
         private readonly IRouteValidationService routeValidationService;
-        private readonly IElevatorEventLogService elevatorEventLogService;
 
         public ElevatorRouteService(
             IElevatorPoolService elevatorPoolService,
             IElevatorControlService elevatorControlService,
-            IRouteValidationService routeValidationService,
-            IElevatorEventLogService elevatorEventLogService)
+            IRouteValidationService routeValidationService)
         {
             this.elevatorPoolService = elevatorPoolService;
             this.elevatorControlService = elevatorControlService;
             this.routeValidationService = routeValidationService;
-            this.elevatorEventLogService = elevatorEventLogService;
         }
 
         public ElevatorMovementResult InitiateRoute(int startFloor, int targetFloor)
@@ -43,7 +40,7 @@ namespace BarboraElevator.Services
             {
                 return new ElevatorMovementNotStartedResult
                 {
-                    Message = "No elevators available."
+                    Message = "No elevators available"
                 };
             }
 
